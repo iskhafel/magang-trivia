@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import Quiz from "./pages/Quiz/Quiz";
+import Quiz from "./pages/Quiz";
 
 export default function App() {
   return (

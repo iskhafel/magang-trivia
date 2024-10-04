@@ -45,7 +45,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-800">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100">
       <Card className="max-w-sm w-full mx-auto">
         <h1 className="text-3xl font-bold mx-auto">Login</h1>
         <form className="flex flex-col gap-4">
