@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import { Button, Card, Label, TextInput } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,23 +21,17 @@ export default function LoginPage() {
 
     setNotification("");
 
-    axios
-      .post("https://reqres.in/api/login", {
-        email: email,
-        password: password,
-      })
-      .then((response) => {
-        const token = response.data.token;
-        console.log("Email:", email);
-        console.log("Password:", password);
-        console.log("Token received:", token);
-        localStorage.setItem("token", token);
-        navigate("/quiz");
-      })
-      .catch((error) => {
-        setNotification("Invalid email or password");
-        console.log(error);
-      });
+    const correctEmail = "magang@trivia.com";
+    const correctPassword = "admin123";
+
+    if (email === correctEmail && password === correctPassword) {
+      console.log("Email:", email);
+      console.log("Password:", password);
+      navigate("/quiz");
+    } else {
+      setNotification("Invalid email or password");
+      console.log("Invalid credentials");
+    }
 
     setEmail("");
     setPassword("");
@@ -48,7 +41,7 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100">
       <Card className="max-w-sm w-full mx-auto">
         <h1 className="text-3xl font-bold mx-auto">Login</h1>
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div>
             {!!notification.length && (
               <p className="text-red-500 text-center">{notification}</p>
@@ -79,9 +72,7 @@ export default function LoginPage() {
               required
             />
           </div>
-          <Button type="submit" onClick={handleSubmit}>
-            Submit
-          </Button>
+          <Button type="submit">Submit</Button>
         </form>
       </Card>
     </div>

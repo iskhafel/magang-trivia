@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Quiz() {
   const [questions, setQuestions] = useState([]);
@@ -13,9 +14,10 @@ export default function Quiz() {
   const [quizTimer, setQuizTimer] = useState(30);
 
   useEffect(() => {
-    fetch("https://opentdb.com/api.php?amount=10")
-      .then((response) => response.json())
-      .then((data) => {
+    axios
+      .get("https://opentdb.com/api.php?amount=10")
+      .then((response) => {
+        const data = response.data;
         const formattedQuestions = data.results.map((question) => ({
           question: question.question,
           correctAnswer: question.correct_answer,
@@ -25,6 +27,9 @@ export default function Quiz() {
           ].sort(() => Math.random() - 0.5),
         }));
         setQuestions(formattedQuestions);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
       });
   }, []);
 
