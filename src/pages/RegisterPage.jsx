@@ -103,20 +103,10 @@ export default function LoginPage() {
               <Label value="Role" />
             </div>
             <div className="flex gap-4">
-              <Radio
-                id="role1"
-                name="role1"
-                value="1"
-                onChange={handleRoleId}
-              />
+              <Radio id="role" name="role" value="1" onChange={handleRoleId} />
               <Label htmlFor="role1">Admin</Label>
 
-              <Radio
-                id="role2"
-                name="role2"
-                value="2"
-                onChange={handleRoleId}
-              />
+              <Radio id="role" name="role" value="2" onChange={handleRoleId} />
               <Label htmlFor="role2">User</Label>
             </div>
           </div>
