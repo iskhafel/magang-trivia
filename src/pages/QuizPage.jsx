@@ -2,68 +2,66 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function Quiz() {
-  const [questions, setQuestions] = useState([]);
-  const [activeQuestion, setActiveQuestion] = useState(0);
-  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
-  const [result, setResult] = useState({
-    answeredQuestions: 0,
-    correctAnswers: 0,
-    wrongAnswers: 0,
+  const [soal, setSoal] = useState([]);
+  const [soalAktif, setSoalAktif] = useState(0);
+  const [pilihan, setPilihan] = useState(null);
+  const [hasil, setHasil] = useState({
+    jumlahJawab: 0,
+    jumlahBenar: 0,
+    jumlahSalah: 0,
   });
   const [showResult, setShowResult] = useState(false);
-  const [quizTimer, setQuizTimer] = useState(30);
+  const [timer, setTimer] = useState(30);
 
   useEffect(() => {
     axios
       .get("https://opentdb.com/api.php?amount=10")
       .then((response) => {
-        const data = response.data;
-        const formattedQuestions = data.results.map((question) => ({
-          question: question.question,
-          correctAnswer: question.correct_answer,
-          choices: [
-            ...question.incorrect_answers,
-            question.correct_answer,
-          ].sort(() => Math.random() - 0.5),
+        const formatSoal = response.data.results.map((data) => ({
+          pertanyaan: data.question,
+          jawabanBenar: data.correct_answer,
+          pilihanJawaban: [...data.incorrect_answers, data.correct_answer].sort(
+            () => Math.random() - 0.5
+          ),
         }));
-        setQuestions(formattedQuestions);
+        setSoal(formatSoal);
       })
       .catch((error) => {
-        console.error("Error fetching data: ", error);
+        console.error("Gagal mengambil data: ", error);
       });
   }, []);
 
   useEffect(() => {
-    if (quizTimer === 0) setShowResult(true);
+    if (timer === 0) setShowResult(true);
 
     const intervalId = setInterval(() => {
-      setQuizTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [quizTimer]);
+  }, [timer]);
 
-  const onAnswerSelected = (answer, index) => {
-    const isCorrect = answer === questions[activeQuestion].correctAnswer;
-    setResult((prev) => ({
-      answeredQuestions: prev.answeredQuestions + 1,
-      correctAnswers: prev.correctAnswers + (isCorrect ? 1 : 0),
-      wrongAnswers: prev.wrongAnswers + (!isCorrect ? 1 : 0),
+  const handleAnswer = (jawaban, index) => {
+    const benar = jawaban === soal[soalAktif].jawabanBenar;
+    setHasil((prev) => ({
+      jumlahJawab: prev.jumlahJawab + 1,
+      jumlahBenar: prev.jumlahBenar + (benar ? 1 : 0),
+      jumlahSalah: prev.jumlahSalah + (!benar ? 1 : 0),
     }));
-    setSelectedAnswerIndex(index);
+    setPilihan(index);
 
     setTimeout(() => {
-      if (activeQuestion < questions.length - 1) {
-        setActiveQuestion((prev) => prev + 1);
+      if (soalAktif < soal.length - 1) {
+        setSoalAktif((prev) => prev + 1);
       } else {
         setShowResult(true);
       }
-      setSelectedAnswerIndex(null);
+      setPilihan(null);
     }, 500);
   };
 
-  if (questions.length === 0) {
-    return <div className="text-center text-lg">Loading...</div>;
+  if (soal.length === 0) {
+    return <div className="text-center text-lg">Loading</div>;
   }
 
   return (
@@ -72,53 +70,48 @@ export default function Quiz() {
         <div>
           <div className="mb-4 flex justify-between">
             <div>
-              <span className="text-xl font-bold">{activeQuestion + 1}</span>
-              <span className="text-gray-500">/{questions.length}</span>
+              <span className="text-xl font-bold">{soalAktif + 1}</span>
+              <span className="text-gray-500">/{soal.length}</span>
             </div>
-            <span className="text-gray-600">
-              Waktu yang Tersisa: {quizTimer}s
-            </span>
+            <span className="text-gray-600">Timer: {timer}s</span>
           </div>
           <h2
             className="text-xl font-semibold mb-5"
             dangerouslySetInnerHTML={{
-              __html: questions[activeQuestion].question,
+              __html: soal[soalAktif].pertanyaan,
             }}
           />
           <ul className="gap-4">
-            {questions[activeQuestion].choices.map((answer, index) => (
+            {soal[soalAktif].pilihanJawaban.map((jawaban, index) => (
               <li
-                key={answer}
-                onClick={() => onAnswerSelected(answer, index)}
+                key={jawaban}
+                onClick={() => handleAnswer(jawaban, index)}
                 className={`p-4 border rounded-lg cursor-pointer hover:bg-blue-100 transition ${
-                  selectedAnswerIndex === index
-                    ? "bg-blue-200 border-blue-500"
-                    : "bg-white"
+                  pilihan === index ? "bg-blue-200 border-blue-500" : "bg-white"
                 }`}
               >
-                <span dangerouslySetInnerHTML={{ __html: answer }} />
+                <span dangerouslySetInnerHTML={{ __html: jawaban }} />
               </li>
             ))}
           </ul>
         </div>
       ) : (
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-5">Result</h3>
+          <h3 className="text-2xl font-bold mb-5">Hasil</h3>
           <p className="text-lg">
-            Total Soal:{" "}
-            <span className="font-semibold">{questions.length}</span>
+            Total Soal: <span className="font-semibold">{soal.length}</span>
           </p>
           <p className="text-lg py-2">
             Jumlah yang dijawab:{" "}
-            <span className="font-semibold">{result.answeredQuestions}</span>
+            <span className="font-semibold">{hasil.jumlahJawab}</span>
           </p>
           <p className="text-lg">
             Jumlah benar:{" "}
-            <span className="font-semibold">{result.correctAnswers}</span>
+            <span className="font-semibold">{hasil.jumlahBenar}</span>
           </p>
           <p className="text-lg">
             Jumlah salah:{" "}
-            <span className="font-semibold">{result.wrongAnswers}</span>
+            <span className="font-semibold">{hasil.jumlahSalah}</span>
           </p>
         </div>
       )}
