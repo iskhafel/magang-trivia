@@ -2,16 +2,6 @@
 
 This project is a trivia quiz application that fetches random questions from an API. Users can attempt to answer the questions within a set time limit and view their results at the end.
 
-## Table of Contents
-
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
-- [APIs Used](#apis-used)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Features
 
 - Fetches random trivia questions from an API.
@@ -46,10 +36,10 @@ This project is a trivia quiz application that fetches random questions from an 
 3. Start the development server:
 
    ```bash
-   npm start
+   npm run dev
    ```
 
-   The app will run locally on [http://localhost:3000](http://localhost:3000).
+   The app will run locally on [http://localhost:5173](http://localhost:5173).
 
 ## Usage
 
