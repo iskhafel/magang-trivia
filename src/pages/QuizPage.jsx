@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Button } from "flowbite-react";
 
 export default function Quiz() {
   const [soal, setSoal] = useState([]);
@@ -12,27 +14,54 @@ export default function Quiz() {
   });
   const [showResult, setShowResult] = useState(false);
   const [timer, setTimer] = useState(30);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get("https://opentdb.com/api.php?amount=10")
-      .then((response) => {
-        const formatSoal = response.data.results.map((data) => ({
-          pertanyaan: data.question,
-          jawabanBenar: data.correct_answer,
-          pilihanJawaban: [...data.incorrect_answers, data.correct_answer].sort(
-            () => Math.random() - 0.5
-          ),
-        }));
-        setSoal(formatSoal);
-      })
-      .catch((error) => {
-        console.error("Gagal mengambil data: ", error);
-      });
+    const savedState = JSON.parse(localStorage.getItem("quizState"));
+    if (savedState) {
+      setSoal(savedState.soal);
+      setSoalAktif(savedState.soalAktif);
+      setHasil(savedState.hasil);
+      setTimer(savedState.timer);
+      setShowResult(savedState.showResult);
+    } else {
+      axios
+        .get("https://opentdb.com/api.php?amount=10")
+        .then((response) => {
+          const formatSoal = response.data.results.map((data) => ({
+            pertanyaan: data.question,
+            jawabanBenar: data.correct_answer,
+            pilihanJawaban: [
+              ...data.incorrect_answers,
+              data.correct_answer,
+            ].sort(() => Math.random() - 0.5),
+          }));
+          setSoal(formatSoal);
+        })
+        .catch((error) => {
+          console.error("Gagal mengambil data: ", error);
+        });
+    }
   }, []);
 
   useEffect(() => {
-    if (timer === 0) setShowResult(true);
+    if (soal.length > 0) {
+      const quizState = {
+        soal,
+        soalAktif,
+        hasil,
+        timer,
+        showResult,
+      };
+      localStorage.setItem("quizState", JSON.stringify(quizState));
+    }
+  }, [soal, soalAktif, hasil, timer, showResult]);
+
+  useEffect(() => {
+    if (timer === 0) {
+      setShowResult(true);
+      return;
+    }
 
     const intervalId = setInterval(() => {
       setTimer((prev) => (prev > 0 ? prev - 1 : 0));
@@ -60,8 +89,13 @@ export default function Quiz() {
     }, 500);
   };
 
+  const handleRestart = () => {
+    localStorage.removeItem("quizState");
+    navigate("/");
+  };
+
   if (soal.length === 0) {
-    return <div className="text-center text-lg">Loading</div>;
+    return <div className="text-center text-lg">Loading...</div>;
   }
 
   return (
@@ -113,6 +147,14 @@ export default function Quiz() {
             Jumlah salah:{" "}
             <span className="font-semibold">{hasil.jumlahSalah}</span>
           </p>
+
+          <Button
+            className="mt-5 mx-auto"
+            color="success"
+            onClick={handleRestart}
+          >
+            Kembali ke HomePage
+          </Button>
         </div>
       )}
     </div>
