@@ -33,7 +33,7 @@ export default function LoginPage() {
         setError(false);
 
         setTimeout(() => {
-          navigate("/welcome-quiz");
+          navigate("/home");
         }, 1000);
       })
       .catch((error) => {
