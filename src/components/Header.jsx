@@ -1,15 +1,7 @@
-import { Navbar, Button } from "flowbite-react";
+import { Navbar } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    navigate("/login");
-  };
-
   return (
     <div>
       <Navbar fluid={true} rounded={true}>
@@ -24,17 +16,11 @@ export default function Header() {
           </span>
         </Navbar.Brand>
 
-        <Navbar.Collapse>
+        <Navbar.Collapse className="">
           <Link to="/home">Home</Link>
           <Link to="/welcome-quiz">Quiz</Link>
         </Navbar.Collapse>
-        <div className="flex">
-          {localStorage.getItem("access_token") ? (
-            <Button onClick={handleLogout}>Logout</Button>
-          ) : (
-            <Button onClick={() => navigate("/login")}>Login</Button>
-          )}
-        </div>
+        <div className="flex ml-5"></div>
       </Navbar>
     </div>
   );
